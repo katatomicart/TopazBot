@@ -33,10 +33,10 @@ class Salary(commands.Cog):
                 try:
                     dels = defaultdict(list)
 
-                    req = f"""SELECT UUID, info ->> 'salaries' FROM guilddata;"""
+                    req = f"""SELECT unique_id, info ->> 'salaries' FROM guilddata;"""
                     async with self.bot.db._conn.acquire() as connection:
                         response = await connection.fetch(req)
-                    guilds = (y for y in ((x["uuid"], json.loads(x["?column?"])) for x in response if x["?column?"]) if
+                    guilds = (y for y in ((x["unique_id"], json.loads(x["?column?"])) for x in response if x["?column?"]) if
                               y[1])
 
                     for guild, roles in guilds:

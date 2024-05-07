@@ -1,3 +1,4 @@
+import os
 import asyncio
 import logging
 import secrets
@@ -50,14 +51,16 @@ register = {
 }
 
 
+CLIENT_ID = os.environ.get("DISCORD_CLIENT_ID")
+CLIENT_SECRET = os.environ.get("DISCORD_CLIENT_SECRET")
+
+
 class API(web.Application):
     def __init__(self, bot, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.pool = None
-
-        with open("pyhtml/auth", 'r') as af:
-            self.client_id, self.client_secret = json.loads(af.read())
-
+        self.client_id = CLIENT_ID
+        self.client_secret = CLIENT_SECRET
         self.bot = bot
         self.session = aiohttp.ClientSession(loop=bot.loop)
         self.logger = logging.getLogger('currency-converter')
@@ -110,7 +113,7 @@ class API(web.Application):
     async def get_botdata(self, snowflake: int):
         async with self.pool.acquire() as connection:
             response = await connection.fetch(
-                f"""SELECT * FROM botdata WHERE UUID = $1""", snowflake
+                f"""SELECT * FROM botdata WHERE unique_id = $1::bigint""", snowflake
             )
 
         return response
@@ -118,7 +121,7 @@ class API(web.Application):
     async def get_userdata(self, snowflake: int):
         async with self.pool.acquire() as connection:
             response = await connection.fetchval(
-                f"""SELECT info FROM userdata WHERE UUID= $1""", snowflake
+                f"""SELECT info FROM userdata WHERE unique_id= $1::bigint""", snowflake
             )
 
         return json.loads(response)
@@ -126,7 +129,7 @@ class API(web.Application):
     async def get_serverdata(self, snowflake: int):
         async with self.pool.acquire() as connection:
             response = await connection.fetchval(
-                f"""SELECT info FROM guilddata WHERE UUID = $1""", snowflake
+                f"""SELECT info FROM guilddata WHERE unique_id = $1::bigint""", snowflake
             )
 
         return json.loads(response)
@@ -139,17 +142,20 @@ class API(web.Application):
         data = {
             "code": code,
             "grant_type": "authorization_code",
-            "redirect_uri": "http://api.typheus.me/hub",
+            "redirect_uri": "https://topaz-bot.b943.cl/code",
             "client_id": self.client_id,
             "client_secret": self.client_secret,
-            "scope": 'identify guilds'
+            "scope": "identify guilds"
         }
+
         response = await self.session.post(
-            f"https://discordapp.com/api/oauth2/token",
-            data=urlencode(data),
-            headers={'Content-Type': "application/x-www-form-urlencoded"}
+            "https://discordapp.com/api/oauth2/token",
+            data=data
         )
+
         js = await response.json()
+        self.logger.info(urlencode(data))
+        self.logger.info(js)
         if 'error' in js:
             raise web.HTTPServerError(reason=f"Invalid code or redirect {js['error']}")
         token = js['access_token']
@@ -168,6 +174,7 @@ class API(web.Application):
         js = await api_resp.json()
         if "code" in js:
             return web.StreamResponse(reason=js["message"], status=js["code"])
+        self.logger.info(js["id"])
         resp = await self.get_userdata(js['id'])
         guilds = await (await self.session.get("https://discordapp.com/api/users/@me/guilds",
                                                headers={
@@ -231,7 +238,7 @@ class API(web.Application):
         fmap = map(lambda x: f"<li>{x[0]} x{x[1]}</li>", sorted(user_data["items"].items()))
         inventory = "\n".join(fmap)
 
-        req = f"""SELECT (UUID, info->'{guild_id}'->>'money') FROM userdata;"""
+        req = f"""SELECT (unique_id, info->'{guild_id}'->>'money') FROM userdata;"""
         async with self.pool.acquire() as connection:
             resp = await connection.fetch(req)
 
@@ -327,7 +334,7 @@ class API(web.Application):
         guild = int(request.match_info['guild'])
         user = int(request.match_info['user'])
 
-        req = f"""SELECT info FROM userdata WHERE UUID = $1"""
+        req = f"""SELECT info FROM userdata WHERE unique_id = $1::bigint"""
         async with self.bot.db._conn.acquire() as connection:
             response = await connection.fetchval(req, user)
         if response:
@@ -352,7 +359,7 @@ class API(web.Application):
     async def getusers(self, request: web.Request):
         guild = int(request.match_info['guild'])
 
-        req = f"""SELECT UUID, info->$1 FROM userdata WHERE CAST (info->$1 AS json) is not NULL"""
+        req = f"""SELECT unique_id, info->$1 FROM userdata WHERE CAST (info->$1 AS json) is not NULL"""
         async with self.bot.db._conn.acquire() as connection:
             response = await connection.fetch(req, str(guild))
 
@@ -365,7 +372,7 @@ class API(web.Application):
     # @server.route("/guild/<int:guild>/", methods=["GET"])
     async def getguild(self, request: web.Request):
         guild = int(request.match_info['guild'])
-        req = f"""SELECT info FROM guilddata WHERE UUID = $1"""
+        req = f"""SELECT info FROM guilddata WHERE unique_id = $1::bigint"""
         async with self.bot.db._conn.acquire() as connection:
             response = await connection.fetchval(req, guild)
         if response:

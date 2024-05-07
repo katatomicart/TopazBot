@@ -64,7 +64,7 @@ class Bot(commands.AutoShardedBot):
         super().__init__(*args, game=discord.Game(name="rp!help for help!"), **kwargs)
         self.prefixes = {}
         self.owner_id = os.environ.get("DISCORD_OWNER_ID")
-        self.lounge_id = os.environ.get("DISCORD_LOUNGE_ID")
+        #self.lounge_id = os.environ.get("DISCORD_LOUNGE_ID")
         self.uptime = datetime.datetime.now(datetime.timezone.utc)
         self.commands_used = Counter()
         self.server_commands = Counter()
@@ -156,9 +156,8 @@ class Bot(commands.AutoShardedBot):
         print(self.user.name)
         print(self.user.id)
         print('------')
-        await self.change_presence(activity=discord.Game(name="RPGBot will be deprecated January 1st, 2024. Read more about how you can switch to RPGBot-V2 [here](https://github.com/henry232323/RPGBot/blob/master/deprecation_notice.md)"))
+        await self.change_presence(activity=discord.Game(name="This is a test message for personal use bot, no deprecations :P"))
         if self._first:
-            #asyncio.create_task(self.update_stats())
             self._first = False
 
     async def on_message(self, msg):
@@ -354,7 +353,7 @@ class Bot(commands.AutoShardedBot):
 
 
 prefixes = ['rp!', 'pb!', '<@305177429612298242> ', 'Rp!'] if "debug" not in sys.argv else 'rp$'
-invlink = "https://discordapp.com/oauth2/authorize?client_id=305177429612298242&scope=bot&permissions=322625"
+invlink = "https://discordapp.com/oauth2/authorize?client_id=1237486050193047663&scope=bot&permissions=322625"
 servinv = "https://discord.gg/UYJb8fQ"
 sourcelink = "https://github.com/katatomicart/TopazBot"
 tutoriallink = "https://github.com/katatomicart/TopazBot/blob/master/tutorial.md"
@@ -413,5 +412,5 @@ async def start():
     )
     await prp.start(BOT_TOKEN)
 
-
+print(BOT_TOKEN)
 asyncio.run(start())

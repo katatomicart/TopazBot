@@ -60,20 +60,20 @@ class Database:
     async def user_insert(self, member, data):
         """Create a new user entry with the given data"""
         jd = self.dump({member.guild.id: data})
-        req = """INSERT INTO userdata (UUID, info) VALUES ($1, $2)"""
+        req = """INSERT INTO userdata (unique_id, info) VALUES ($1::bigint, $2)"""
         async with self._conn.acquire() as connection:
             await connection.execute(req, member.id, jd)
 
     async def user_select(self, member):
         """Select a user's data for a specified server"""
-        req = """SELECT info -> $2 FROM userdata WHERE UUID = $1"""
+        req = """SELECT info -> $2 FROM userdata WHERE unique_id = $1::bigint"""
         async with self._conn.acquire() as connection:
             response = await connection.fetchval(req, member.id, str(member.guild.id))
         return json.loads(response) if response else response
 
     async def user_full_select(self, member):
         """Select a user's data for a specified server"""
-        req = """SELECT info FROM userdata WHERE UUID = $1"""
+        req = """SELECT info FROM userdata WHERE unique_id = $1::bigint"""
         async with self._conn.acquire() as connection:
             response = await connection.fetchval(req, member.id)
         return json.loads(response) if response else response
@@ -83,13 +83,13 @@ class Database:
         jd = self.dump(data)
         req = """UPDATE userdata
         SET info = $1
-        WHERE UUID = $2"""
+        WHERE unique_id = $2"""
         async with self._conn.acquire() as connection:
             await connection.execute(req, jd, member.id)
 
     async def user_exists(self, member):
         """Check if a user has an entry in the db"""
-        req = """SELECT info FROM userdata WHERE UUID = $1"""
+        req = """SELECT info FROM userdata WHERE unique_id = $1::bigint"""
         async with self._conn.acquire() as connection:
             return bool(await connection.fetchval(req, member.id))
 
@@ -124,7 +124,7 @@ class Database:
 
     async def get_all_user_data(self, member):
         """Get a user's data for all servers"""
-        req = """SELECT info FROM userdata WHERE UUID = $1"""
+        req = """SELECT info FROM userdata WHERE unique_id = $1::bigint"""
         async with self._conn.acquire() as connection:
             response = await connection.fetchval(req, member.id)
         return json.loads(response) if response else response
@@ -134,13 +134,13 @@ class Database:
     async def guild_insert(self, guild, data):
         """Add a new guild to the db"""
         jd = self.dump(data)
-        req = """INSERT INTO guilddata (UUID, info) VALUES ($1, $2)"""
+        req = """INSERT INTO guilddata (unique_id, info) VALUES ($1::bigint, $2)"""
         async with self._conn.acquire() as connection:
             await connection.execute(req, guild.id, jd)
 
     async def guild_select(self, guild):
         """Get a guild from the db"""
-        req = """SELECT info FROM guilddata WHERE UUID = $1"""
+        req = """SELECT info FROM guilddata WHERE unique_id = $1::bigint"""
         async with self._conn.acquire() as connection:
             response = await connection.fetchval(req, guild.id)
         return json.loads(response) if response else response
@@ -149,8 +149,8 @@ class Database:
         """Update a guild"""
         jd = self.dump(data)
         req = """UPDATE guilddata
-        SET info = $1
-        WHERE UUID = $2"""
+        SET info = $1::bigint
+        WHERE unique_id = $1::bigint"""
         async with self._conn.acquire() as connection:
             await connection.execute(req, jd, guild.id)
 
@@ -169,12 +169,12 @@ class Database:
         # await self.guild_insert(guild, data)
         # upsert
         jd = self.dump(data)
-        req = """INSERT INTO guilddata (UUID, info)
+        req = """INSERT INTO guilddata (unique_id, info)
         VALUES (
-            $1,
+            $1::bigint,
             $2
         )
-        ON CONFLICT (UUID) 
+        ON CONFLICT (unique_id) 
         DO 
             UPDATE
             SET info = $2;
@@ -192,7 +192,7 @@ class Database:
         if values:
             return values
         else:
-            req = """SELECT info FROM guilddata WHERE UUID = $1"""
+            req = """SELECT info FROM guilddata WHERE unique_id = $1::bigint"""
             async with self._conn.acquire() as connection:
                 response = await connection.fetchval(req, guild.id)
             data = json.loads(response) if response else response
@@ -205,13 +205,13 @@ class Database:
             # return await self.get_guild_data(guild)
 
     async def guild_item(self, guild, name: str):
-        req = """SELECT info ->> $1 FROM guilddata WHERE UUID = $2"""
+        req = """SELECT info ->> $1 FROM guilddata WHERE unique_id = $2::bigint"""
         async with self._conn.acquire() as connection:
             response = await connection.fetchval(req, name, guild.id)
         return response if response else copy.deepcopy(self.bot.default_servdata[name])
 
     async def user_item(self, member, name: str):
-        req = """SELECT info -> $1 ->> $2 FROM userdata WHERE UUID = $3"""
+        req = """SELECT info -> $1 ->> $2 FROM userdata WHERE unique_id = $3::bigint"""
         async with self._conn.acquire() as connection:
             response = await connection.fetchval(req, str(member.guild.id), name, member.id)
         return response if response else copy.copy(self.bot.default_udata[name])
