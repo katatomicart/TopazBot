@@ -50,9 +50,9 @@ class Database:
         self._conn = await asyncpg.create_pool(
             user=os.environ.get("DATABASE_USER"),
             password=os.environ.get("DATABASE_PASSWORD"),
-            database="pokerpg-new",
-            host="localhost",
-            port=self.bot.tunnel.local_bind_port,
+            database=os.environ.get("DATABASE_NAME"),
+            host=os.environ.get("DATABASE_HOST"),
+            port=os.environ.get("DATABASE_PORT"),
         )
 
     # User functions

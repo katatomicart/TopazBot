@@ -37,7 +37,6 @@ import ujson as json
 # from datadog import ThreadStats
 # from datadog import initialize as init_dd
 from discord.ext import commands
-from sshtunnel import SSHTunnelForwarder
 
 import cogs
 from cogs.utils import db, data
@@ -57,13 +56,16 @@ if os.getcwd().endswith("rpgtest"):
     sys.argv.append("debug")
 
 
+BOT_TOKEN = os.environ.get("DISCORD_AUTH_TOKEN")
+
+
 class Bot(commands.AutoShardedBot):
     def __init__(self, tunnel=None, *args, **kwargs):
         super().__init__(*args, game=discord.Game(name="rp!help for help!"), **kwargs)
         self.prefixes = {}
-        self.owner_id = 122739797646245899
-        self.lounge_id = 166349353999532035
-        self.uptime = datetime.datetime.utcnow()
+        self.owner_id = os.environ.get("DISCORD_OWNER_ID")
+        self.lounge_id = os.environ.get("DISCORD_LOUNGE_ID")
+        self.uptime = datetime.datetime.now(datetime.timezone.utc)
         self.commands_used = Counter()
         self.server_commands = Counter()
         self.socket_stats = Counter()
@@ -82,8 +84,8 @@ class Bot(commands.AutoShardedBot):
         self.session = aiohttp.ClientSession()
         self.shutdowns.append(self.shutdown)
 
-        with open("resources/auth") as af:
-            self._auth = json.loads(af.read())
+        #with open("resources/auth") as af:
+        #    self._auth = json.loads(af.read())
 
         with open("resources/dnditems.json", 'r') as dndf:
             self.dnditems = json.loads(dndf.read())
@@ -102,9 +104,6 @@ class Bot(commands.AutoShardedBot):
         self.default_udata = data.default_user
         self.default_servdata = data.default_server
         self.rnd = "1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-
-        with open("resources/patrons.json") as pj:
-            self.patrons = {int(k): v for k, v in json.loads(pj.read()).items()}
 
         with open("resources/newtranslations.json", 'rb') as trf:
             self.translations = json.loads(trf.read().decode())
@@ -159,7 +158,7 @@ class Bot(commands.AutoShardedBot):
         print('------')
         await self.change_presence(activity=discord.Game(name="RPGBot will be deprecated January 1st, 2024. Read more about how you can switch to RPGBot-V2 [here](https://github.com/henry232323/RPGBot/blob/master/deprecation_notice.md)"))
         if self._first:
-            asyncio.create_task(self.update_stats())
+            #asyncio.create_task(self.update_stats())
             self._first = False
 
     async def on_message(self, msg):
@@ -202,23 +201,19 @@ class Bot(commands.AutoShardedBot):
                         await hook.send(content, avatar_url=url,
                                         files=dfiles, embeds=embeds)
 
-    async def update_stats(self):
-        url = "https://bots.discord.pw/api/bots/{}/stats".format(self.user.id)
-        while not self.is_closed():
-            payload = json.dumps(dict(server_count=len(self.guilds))).encode()
-            headers = {'authorization': self._auth[1], "Content-Type": "application/json"}
-
-            async with self.session.post(url, data=payload, headers=headers) as response:
-                await response.read()
-
-            url = "https://discordbots.org/api/bots/{}/stats".format(self.user.id)
-            payload = json.dumps(dict(server_count=len(self.guilds))).encode()
-            headers = {'authorization': self._auth[2], "Content-Type": "application/json"}
-
-            async with self.session.post(url, data=payload, headers=headers) as response:
-                await response.read()
-
-            await asyncio.sleep(14400)
+    #async def update_stats(self):
+    #    url = "https://bots.discord.pw/api/bots/{}/stats".format(self.user.id)
+    #    while not self.is_closed():
+    #        payload = json.dumps(dict(server_count=len(self.guilds))).encode()
+    #        headers = {'authorization': self._auth[1], "Content-Type": "application/json"}
+    #        async with self.session.post(url, data=payload, headers=headers) as response:
+    #            await response.read()
+    #        url = "https://discordbots.org/api/bots/{}/stats".format(self.user.id)
+    #        payload = json.dumps(dict(server_count=len(self.guilds))).encode()
+    #        headers = {'authorization': self._auth[2], "Content-Type": "application/json"}
+    #        async with self.session.post(url, data=payload, headers=headers) as response:
+    #            await response.read()
+    #        await asyncio.sleep(14400)
 
     async def on_command(self, ctx):
         # self.stats.increment("RPGBot.commands", tags=["RPGBot:commands"], host="scw-8112e8")
@@ -228,16 +223,6 @@ class Bot(commands.AutoShardedBot):
         if self.commands_used[ctx.command] % 100 == 0:
             seed(self.socket_stats["PRESENCE_UPDATE"])
         if isinstance(ctx.author, discord.Member):
-            self.server_commands[ctx.guild.id] += 1
-            if ctx.guild.id not in self.patrons:
-                if (self.server_commands[ctx.guild.id] % 50) == 0:
-                    await ctx.send(discord.Embed(description=await _(ctx,
-                                                                     "This bot costs $300/yr to run. If you like the utilities it provides,"
-                                                                     " consider buying me a [coffee](https://ko-fi.com/henrys)"
-                                                                     " or subscribe as a [Patron](https://www.patreon.com/henry232323)"
-                                                                     " We've also recently released a new version of the bot, get it [here](https://discord.com/oauth2/authorize?client_id=673737213959208980&scope=bot&permissions=805596240) "
-                                                                     )))
-
             if await self.di.get_exp_enabled(ctx.guild):
                 add = choice([0, 0, 0, 0, 0, 1, 1, 2, 3])
                 fpn = ctx.command.full_parent_name.lower()
@@ -371,27 +356,19 @@ class Bot(commands.AutoShardedBot):
 prefixes = ['rp!', 'pb!', '<@305177429612298242> ', 'Rp!'] if "debug" not in sys.argv else 'rp$'
 invlink = "https://discordapp.com/oauth2/authorize?client_id=305177429612298242&scope=bot&permissions=322625"
 servinv = "https://discord.gg/UYJb8fQ"
-sourcelink = "https://github.com/henry232323/RPGBot"
-tutoriallink = "https://github.com/henry232323/RPGBot/blob/master/tutorial.md"
-votelink = "https://top.gg/bot/305177429612298242/vote"
-privlink = "https://github.com/henry232323/RPGBot-V2-Issue-Tracker/blob/master/PRIVACY_POLICY.md"
-description = f"A Bot for assisting with RPG made by Henry#6174," \
+sourcelink = "https://github.com/katatomicart/TopazBot"
+tutoriallink = "https://github.com/katatomicart/TopazBot/blob/master/tutorial.md"
+description = f"A for for the bot made by Henry#6174 by katatomicart for assisting with RPG made by ," \
               " with a working inventory, market and economy," \
               " team setups and characters as well. Each user has a server unique inventory and balance." \
               " Players may list items on a market for other users to buy." \
               " Users may create characters with teams from pets. " \
               "Server administrators may add and give items to the server and its users.```\n" \
-              "**RPGBot V2 is out! Get it here!** <https://discord.com/oauth2/authorize?client_id=673737213959208980&scope=bot&permissions=805596240>\n" \
               f"**Add to your server**: <{invlink}>\n" \
               f"**Support Server**: {servinv}\n" \
               f"**Command List**: <{sourcelink}>\n" \
-              f"**Tutorial**: <{tutoriallink}>\n" \
-              f"**Vote**: <{votelink}>\n" \
-              f"**Privacy Policy**: <{privlink}>\n" \
-              "**Support Me on Patreon**: <https://www.patreon.com/henry232323>\n```"
+              f"**Tutorial**: <{tutoriallink}>\n"
 
-with open("resources/auth") as af:
-    _auth = json.loads(af.read())
 
 
 async def prefix(bot, msg):
@@ -421,25 +398,20 @@ if "debug" in sys.argv:
 
 
 async def start():
-    with SSHTunnelForwarder(
-            (os.environ.get("SSH_HOST"), 22),
-            remote_bind_address=(os.environ.get("DATABASE_HOST", 0), int(os.environ.get("DATABASE_PORT", 0)))
-    ) as tunnel:
-        intents = discord.Intents.default()
-        intents.members = True
-        intents.messages = True
-        intents.message_content = True
+    intents = discord.Intents.default()
+    intents.members = True
+    intents.messages = True
+    intents.message_content = True
 
-        prp = Bot(
-            command_prefix=prefix,
-            description=description,
-            pm_help=True,
-            shard_count=20,
-            intents=intents,
-            tunnel=tunnel
-        )
-
-        await prp.start(_auth[0])
+    prp = Bot(
+        command_prefix=prefix,
+        description=description,
+        pm_help=True,
+        shard_count=20,
+        intents=intents,
+        tunnel=None
+    )
+    await prp.start(BOT_TOKEN)
 
 
 asyncio.run(start())
