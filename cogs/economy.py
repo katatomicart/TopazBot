@@ -833,7 +833,7 @@ Total:\t\t {:.2f} dollars
     @commands.command()
     async def baltop(self, ctx):
         """Get the top 10 server balances"""
-        req = f"""SELECT (UUID, info->'{ctx.guild.id}'->>'money') FROM userdata;"""
+        req = f"""SELECT (unique_id, info->'{ctx.guild.id}'->>'money') FROM userdata;"""
         async with self.bot.db._conn.acquire() as connection:
             resp = await connection.fetch(req)
 

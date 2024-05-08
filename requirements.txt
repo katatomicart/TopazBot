@@ -4,3 +4,4 @@ uvloop
 asyncpg
 pyyaml
 sshtunnel
+ujson
