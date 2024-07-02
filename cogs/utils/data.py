@@ -26,6 +26,7 @@ from collections import Counter
 from collections import OrderedDict
 from operator import itemgetter as _itemgetter
 from random import randint
+from typing import Optional
 
 import discord
 import ujson as json
@@ -46,7 +47,7 @@ class Pet:
 
 @dataclasses.dataclass
 class ServerItem:
-    unique_id: str
+    unique_id: Optional[str]
     name: str
     description: str
     meta: dict
