@@ -71,7 +71,7 @@ class Settings(commands.Cog):
         await ctx.send(embed=embed)
 
     @settings.command()
-    async def edititem(self, ctx, *, item: str, attribute: str, value: str):
+    async def edititem(self, ctx, item: str, attribute: str, *, value: str):
         guild_items = await self.bot.di.get_guild_items(ctx.guild)
         single_item = guild_items.get(item)
         editable_attributes = ["description",]
@@ -81,7 +81,7 @@ class Settings(commands.Cog):
         if attribute not in editable_attributes:
             await ctx.send(await _(ctx, "Editing that attribute is not supported yet"))
             return
-        single_item[attribute] = value
+        setattr(single_item, attribute, value)
         try:
             check = lambda x: x.channel == ctx.channel and x.author == ctx.author
             await ctx.send(await _(ctx, f"You're updating the attribute {attribute} for the item {item}, if you are not sure type cancel"))
