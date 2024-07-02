@@ -46,6 +46,7 @@ class Pet:
 
 @dataclasses.dataclass
 class ServerItem:
+    unique_id: str
     name: str
     description: str
     meta: dict
