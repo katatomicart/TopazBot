@@ -19,6 +19,7 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 # DEALINGS IN THE SOFTWARE.
 import csv
+import uuid
 
 from discord.ext import commands
 import discord
@@ -68,6 +69,34 @@ class Settings(commands.Cog):
         time = settings.get('msgdel', 0)
         embed.add_field(name=await _(ctx, "Message Auto Delete Time"), value=f"{time if time != 0 else 'Never'}")
         await ctx.send(embed=embed)
+
+    @settings.command()
+    async def edititem(self, ctx, *, item: str, attribute: str, value: str):
+        guild_items = await self.bot.di.get_guild_items(ctx.guild)
+        single_item = guild_items.get(item)
+        editable_attributes = ["description",]
+        if not single_item:
+            await ctx.send(await _(ctx, "Item doesnt exist!"))
+            return
+        if attribute not in editable_attributes:
+            await ctx.send(await _(ctx, "Editing that attribute is not supported yet"))
+            return
+        single_item[attribute] = value
+        try:
+            check = lambda x: x.channel == ctx.channel and x.author == ctx.author
+            await ctx.send(await _(ctx, f"You're updating the attribute {attribute} for the item {item}, if you are not sure type cancel"))
+            response = await self.bot.wait_for("message", timeout=60, check=check)
+            if response.content.lower() == "cancel":
+                await ctx.send(await _(ctx, "Cancelling!"))
+                return
+            await self.bot.di.update_specific_item(ctx.guild, ServerItem(**single_item))
+            await ctx.send(await _(ctx, f"{attribute} of Item {item} successfully updated"))
+        except asyncio.TimeoutError:
+            await ctx.send(await _(ctx, "Timed out! Try again"))
+        except Exception:
+            await ctx.send(await _(ctx, "here was an error, it will be fixed someday"))
+
+
 
     @settings.command()
     async def iteminfo(self, ctx, *, item: str):
@@ -146,7 +175,9 @@ class Settings(commands.Cog):
             """
         try:
             item = dict()
+            unique_id = uuid.uuid4()
             item["name"] = name
+            item["unique_id"] = unique_id.hex
             check = lambda x: x.channel == ctx.channel and x.author == ctx.author
             await ctx.send(await _(ctx, "Describe the item (a description for the item)"))
             response = await self.bot.wait_for("message", timeout=120, check=check)

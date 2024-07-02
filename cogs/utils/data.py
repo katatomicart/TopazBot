@@ -770,6 +770,12 @@ class DataInteraction(object):
             gd["items"][item.name] = item
         await self.db.update_guild_data(guild, gd)
 
+    async def update_specific_item(self, guild, serveritem):
+        """Updates an specific item"""
+        gd = await self.db.get_guild_data(guild)
+        gd["items"][serveritem.name] = serveritem
+        await self.db.update_guild_data(guild, gd)
+
     async def remove_item(self, guild, item):
         """Remove a server item"""
         gd = await self.db.get_guild_data(guild)
