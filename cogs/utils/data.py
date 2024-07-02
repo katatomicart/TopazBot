@@ -502,6 +502,7 @@ example_pet = {
 }
 
 example_serveritem = {
+    "unique_id": "229037cb7ecd417eb750087b1b88ca7b",
     "name": "pokeball",
     "description": "Used to catch Pet, one of the weakest balls",
     "meta": {
