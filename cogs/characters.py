@@ -101,7 +101,7 @@ class Characters(commands.Cog):
             embed.add_field(name=await _(ctx, "Owner"), value=str(owner))
             if char.level is not None:
                 embed.add_field(name=await _(ctx, "Level"), value=char.level)
-            if char.class_name:
+            if char.class_name is not None and isinstance(char.class_name, str):
                 embed.add_field(name=await _(ctx, "Class Name"), value=char.class_name)
             mfmt = "\n".join(f"**{x}:** {y}" for x, y in char.meta.items() if x not in ("icon", "image"))
             if mfmt.strip():
@@ -116,7 +116,7 @@ class Characters(commands.Cog):
             embed.add_field(name=await _(ctx, "Owner"), value=str(owner))
             if char.level is not None:
                 embed.add_field(name=await _(ctx, "Level"), value=char.level)
-            if char.class_name is not None:
+            if char.class_name is not None and isinstance(char.class_name, str):
                 embed.add_field(name=await _(ctx, "Class Name"), value=char.class_name)
             mfmt = "\n".join(f"**{x}:** {y}" for x, y in char.meta.items())
             if mfmt.strip():
