@@ -325,6 +325,8 @@ class Characters(commands.Cog):
             character[2] = value
         elif attribute == "level":
             character[3] = int(value)
+        elif attribute == "class_name":
+            character[4] = value
         elif attribute == "meta":
             try:
                 character[5] = {}
