@@ -119,7 +119,6 @@ class Bot(commands.AutoShardedBot):
 
         self.icogs = [
             cogs.admin.Admin(self),
-            cogs.team.Team(self),
             cogs.economy.Economy(self),
             cogs.inventory.Inventory(self),
             cogs.settings.Settings(self),
