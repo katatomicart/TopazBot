@@ -147,15 +147,15 @@ class ResourceManager:
 
 
 class Character(tuple):
-    """Character(name, owner, description, level, team, meta)"""
+    """Character(name, owner, description, level, class_name, meta)"""
     __slots__ = ()
-    _fields = ('name', 'owner', 'description', 'level', 'team', 'meta', 'ustats')
+    _fields = ('name', 'owner', 'description', 'level', 'class_name', 'meta', 'ustats')
 
-    def __new__(_cls, name, owner, description, level, team, meta, ustats=None):
-        'Create new instance of Character(name, owner, description, level, team, meta)'
+    def __new__(_cls, name, owner, description, level, class_name, meta, ustats=None):
+        'Create new instance of Character(name, owner, description, level, class_name, meta)'
         if ustats is None:
             ustats = {}
-        return _tuple.__new__(_cls, (name, owner, description, level, team, meta, ustats))
+        return _tuple.__new__(_cls, (name, owner, description, level, class_name, meta, ustats))
 
     @classmethod
     def _make(cls, iterable, new=tuple.__new__, len=len):
@@ -167,14 +167,14 @@ class Character(tuple):
 
     def _replace(_self, **kwds):
         """Return a new Character object replacing specified fields with new values"""
-        result = _self._make(map(kwds.pop, ('name', 'owner', 'description', 'level', 'team', 'meta'), _self))
+        result = _self._make(map(kwds.pop, ('name', 'owner', 'description', 'level', 'class_name', 'meta'), _self))
         if kwds:
             raise ValueError('Got unexpected field names: %r' % list(kwds))
         return result
 
     def __repr__(self):
         'Return a nicely formatted representation string'
-        return self.__class__.__name__ + '(name=%r, owner=%r, description=%r, level=%r, team=%r, meta=%r, ustats=%r)' % self
+        return self.__class__.__name__ + '(name=%r, owner=%r, description=%r, level=%r, class_name=%r, meta=%r, ustats=%r)' % self
 
     def _asdict(self):
         'Return a new OrderedDict which maps field names to their values.'
@@ -188,7 +188,7 @@ class Character(tuple):
     owner = _property(_itemgetter(1), doc='Alias for field number 1')
     description = _property(_itemgetter(2), doc='Alias for field number 2')
     level = _property(_itemgetter(3), doc='Alias for field number 3')
-    team = _property(_itemgetter(4), doc='Alias for field number 4')
+    class_name = _property(_itemgetter(4), doc='Alias for field number 4')
     meta = _property(_itemgetter(5), doc='Alias for field number 5')
     ustats = _property(_itemgetter(6), doc='Alias for field number 6')
 
@@ -517,7 +517,7 @@ example_character = {
     "owner": 166349353999532035,
     "description": "Likes to catch pets",
     "level": 25,
-    "team": [0],
+    "team": "Squire",
     "meta": {
         "hair": "black",
         "favorite_pet": "Pichi",
@@ -580,15 +580,15 @@ class DataInteraction(object):
         self.db = self.bot.db
         self.rm = ResourceManager(bot)
 
-    async def get_team(self, guild, character):
-        gd = await self.db.get_guild_data(guild)
-        character = Character(*gd["characters"][character])
-        owner = discord.utils.get(guild.members, id=character.owner)
-        ud = await self.db.get_user_data(owner)
-
-        pet = [Pet(*x) if isinstance(x, list) else Pet(**x) for x in ud["box"] if x[0] in character.team]
-
-        return pet
+    #async def get_team(self, guild, character):
+    #    gd = await self.db.get_guild_data(guild)
+    #    character = Character(*gd["characters"][character])
+    #    owner = discord.utils.get(guild.members, id=character.#owner)
+    #    ud = await self.db.get_user_data(owner)
+#
+    #    pet = [Pet(*x) if isinstance(x, list) else Pet(**x) for #x in ud["box"] if x[0] in character.class_name]
+#
+    #    return pet
 
     async def get_box(self, member):
         """Get user's Pet box"""
@@ -973,14 +973,14 @@ class DataInteraction(object):
         del gd.get("recipes", {})[name]
         await self.db.update_guild_data(guild, gd)
 
-    async def add_to_team(self, guild, character, id):
-        """Add a pet to a character's team"""
-        gd = await self.db.get_guild_data(guild)
-        character = gd["characters"][character]
-        character[4].append(id)
-        if len(character[4]) > 6:
-            raise ValueError("Team is limited to 6!")
-        await self.db.update_guild_data(guild, gd)
+    #async def add_to_team(self, guild, character, id):
+    #    """Add a pet to a character's team"""
+    #    gd = await self.db.get_guild_data(guild)
+    #    character = gd["characters"][character]
+    #    character[4].append(id)
+    #    if len(character[4]) > 6:
+    #        raise ValueError("Team is limited to 6!")
+    #    await self.db.update_guild_data(guild, gd)
 
     async def set_guild(self, member, name):
         ud = await self.db.get_user_data(member)
@@ -1015,12 +1015,12 @@ class DataInteraction(object):
         ud["exp"] = exp
         return await self.db.update_user_data(member, ud)
 
-    async def remove_from_team(self, guild, character, id):
-        """Remove a pet from a character's team"""
-        gd = await self.db.get_guild_data(guild)
-        character = gd[4][character]
-        character[4].remove(id)
-        await self.db.update_guild_data(guild, gd)
+    #async def remove_from_team(self, guild, character, id):
+    #    """Remove a pet from a character's team"""
+    #    gd = await self.db.get_guild_data(guild)
+    #    character = gd[4][character]
+    #    character[4].remove(id)
+    #    await self.db.update_guild_data(guild, gd)
 
     async def update_guild_market(self, guild, data):
         """Update a server's market"""

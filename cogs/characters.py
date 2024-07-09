@@ -74,7 +74,7 @@ class Characters(commands.Cog):
             else:
                 words[x[0].casefold()] = [x]
 
-        for key, value in words.items():
+        for key, value in sorted(words.items()):
             if value:
                 embed.add_field(name=key.upper(), value="\n".join(value))
 
@@ -101,10 +101,8 @@ class Characters(commands.Cog):
             embed.add_field(name=await _(ctx, "Owner"), value=str(owner))
             if char.level is not None:
                 embed.add_field(name=await _(ctx, "Level"), value=char.level)
-            # team = await self.bot.di.get_team(ctx.guild, char.name)
-            # if team:
-            #    tfmt = "\n".join(f"{p.name} ({p.type})" for p in team)
-            #    embed.add_field(name=await _(ctx, "Team"), value=tfmt)
+            if char.class_name is not None and isinstance(char.class_name, str):
+                embed.add_field(name=await _(ctx, "Class Name"), value=char.class_name)
             mfmt = "\n".join(f"**{x}:** {y}" for x, y in char.meta.items() if x not in ("icon", "image"))
             if mfmt.strip():
                 embed.add_field(name=await _(ctx, "Additional Info"), value=mfmt)
@@ -118,10 +116,8 @@ class Characters(commands.Cog):
             embed.add_field(name=await _(ctx, "Owner"), value=str(owner))
             if char.level is not None:
                 embed.add_field(name=await _(ctx, "Level"), value=char.level)
-            # team = await self.bot.di.get_team(ctx.guild, char.name)
-            # if team:
-            #    tfmt = "\n".join(f"{p.name} ({p.type})" for p in team)
-            #    embed.add_field(name=await _(ctx, "Team"), value=tfmt)
+            if char.class_name is not None and isinstance(char.class_name, str):
+                embed.add_field(name=await _(ctx, "Class Name"), value=char.class_name)
             mfmt = "\n".join(f"**{x}:** {y}" for x, y in char.meta.items())
             if mfmt.strip():
                 embed.add_field(name=await _(ctx, "Additional Info"), value=mfmt)
@@ -171,7 +167,7 @@ class Characters(commands.Cog):
             return
 
         check = lambda x: x.channel == ctx.channel and x.author == ctx.author
-        character = dict(name=name, owner=user.id, meta=dict(), team=list())
+        character = dict(name=name, owner=user.id, meta=dict(), class_name="No Class")
         await ctx.send(
             await _(ctx, "Describe the character (Relevant character sheet) (Say `done` when you're done describing)"))
         content = ""
@@ -185,6 +181,23 @@ class Characters(commands.Cog):
                 else:
                     content += response.content + "\n"
         character["description"] = content
+        char_classname = "Squire"
+        while True:
+            await ctx.send(
+                await _(ctx, "Name the class that the character has (type skip if you want to add it later) ")
+            )
+            response = await self.bot.wait_for("message", check=check, timeout=300)
+            char_classname = response.content.capitalize()
+            if char_classname.content.lower() == "skip":
+                await ctx.send(
+                    await _(ctx, f"Class assignment skipped"))
+                break
+            await ctx.send(
+                await _(ctx, f"Are you sure that the class {char_classname} is correct? (y/n)"))
+            confirmation = await self.bot.wait_for("message", check=check, timeout=300)
+            if confirmation.content.lower() == "y":
+                break
+        character["class_name"] = char_classname
         await ctx.send(
             await _(ctx,
                     "Any additional info? (Add a character image using the image keyword or"
@@ -312,6 +325,8 @@ class Characters(commands.Cog):
             character[2] = value
         elif attribute == "level":
             character[3] = int(value)
+        elif attribute == "class_name":
+            character[4] = value
         elif attribute == "meta":
             try:
                 character[5] = {}
