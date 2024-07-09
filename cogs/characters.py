@@ -74,7 +74,7 @@ class Characters(commands.Cog):
             else:
                 words[x[0].casefold()] = [x]
 
-        for key, value in words.items():
+        for key, value in sorted(words.items()):
             if value:
                 embed.add_field(name=key.upper(), value="\n".join(value))
 
