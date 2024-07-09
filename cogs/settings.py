@@ -19,7 +19,6 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 # DEALINGS IN THE SOFTWARE.
 import csv
-import uuid
 
 from discord.ext import commands
 import discord
@@ -175,9 +174,7 @@ class Settings(commands.Cog):
             """
         try:
             item = dict()
-            unique_id = uuid.uuid4()
             item["name"] = name
-            item["unique_id"] = unique_id.hex
             check = lambda x: x.channel == ctx.channel and x.author == ctx.author
             await ctx.send(await _(ctx, "Describe the item (a description for the item)"))
             response = await self.bot.wait_for("message", timeout=120, check=check)
