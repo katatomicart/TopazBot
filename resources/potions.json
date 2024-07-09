@@ -1,0 +1,38 @@
+{
+    "Glittery Green Potion": {
+        "name": "Glittery Green Potion",
+        "meta": {
+            "Type": "Potion",
+            "Used": "Potion used! Input ``!glitterygreen``.",
+            "image": "https://i.imgur.com/FvjIrlC.png"
+        },
+        "description": "[POTION]\nA sparkling, shimmery green potion in a bottle. Who knows what it does...?"
+    },
+    "Iridescent Green Potion": {
+        "name": "Iridescent Green Potion",
+        "meta": {
+            "Type": "Potion",
+            "Used": "Potion used! Input ``!iridescentgreen``.",
+            "image": "https://i.imgur.com/BrgbAhz.png"
+        },
+        "description": "[POTION]\nAn iridescent, shimmering green potion in a bottle. Who knows what it does...?"
+    },
+    "Fizzy Green Potion": {
+        "name": "Fizzy Green Potion",
+        "meta": {
+            "Type": "Potion",
+            "Used": "Potion used! Input ``!fizzygreen``.",
+            "image": "https://i.imgur.com/Rph6c7z.png"
+        },
+        "description": "[POTION]\nA fizzy, carbonated green potion in a bottle. Who knows what it does...?\nCan be used in battle and outside of battle, on self or others. Target must be decided before using."
+    },
+    "Clear Green Potion": {
+        "name": "Clear Green Potion",
+        "meta": {
+            "Type": "Potion",
+            "Used": "Potion used! Input ``!cleargreen``.",
+            "image": "https://i.imgur.com/Bn2KVpu.png"
+        },
+        "description": "[POTION]\nA clear green potion in a bottle. Who knows what it does...?\nCan be used in battle and outside of battle, on self or others. Target must be decided before using."
+    }
+}

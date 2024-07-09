@@ -27,6 +27,14 @@ class Backups(commands.Cog):
 
     @commands.command()
     @checks.admin_or_permissions()
+    async def loadtgp(self, ctx):
+        """This command will pre-load all Topaz Guardian Green Potions and make them available to give
+        Requires Bot Moderator or Bot Admin"""
+        await self.bot.di.new_items(ctx.guild, (ServerItem(**item) for item in self.bot.tgpitems.values()))
+        await ctx.send(await _(ctx, "Successfully added all TG Green Potions!"))
+
+    @commands.command()
+    @checks.admin_or_permissions()
     async def loadstarwars(self, ctx):
         """This command will pre-load all Star Wars items and make them available to give
         Requires Bot Moderator or Bot Admin"""
@@ -78,6 +86,21 @@ class Backups(commands.Cog):
 
         await self.bot.di.add_shop_items(ctx.guild, items)
         await ctx.send(await _(ctx, "Successfully added all D&D magic items to shop!"))
+
+    @commands.command()
+    @checks.admin_or_permissions()
+    async def loadtgpshop(self, ctx):
+        """This command will pre-load all Topaz Guardian Green Potions and make them available in shop
+        Requires Bot Moderator or Bot Admin"""
+        items = {}
+        for item, value in self.bot.tgpitems.items():
+            try:
+                items[item] = dict(buy=int("".join(filter(str.isdigit, value["meta"]))), sell=0, level=0)
+            except:
+                continue
+
+        await self.bot.di.add_shop_items(ctx.guild, items)
+        await ctx.send(await _(ctx, "Successfully added all TG Green Potions to shop!"))
 
     @commands.command()
     @checks.admin_or_permissions()
@@ -162,6 +185,8 @@ class Backups(commands.Cog):
             items = self.bot.pokemonitems
         elif name == "starwars":
             items = self.bot.switems
+        elif name == "tgp":
+            items = self.bot.tgpitems
         else:
             await ctx.send(await _(ctx, "That is not a valid input, look at `rp!help unload`"))
             return

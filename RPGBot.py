@@ -99,6 +99,9 @@ class Bot(commands.AutoShardedBot):
         with open("resources/starwars.json", 'r') as swf:
             self.switems = json.loads(swf.read())
 
+        with open("resources/potions.json", 'r') as tgp:
+            self.tgpitems = json.loads(tgp.read())
+
         self.db: db.Database = db.Database(self)
         self.di: data.DataInteraction = data.DataInteraction(self)
         self.default_udata = data.default_user

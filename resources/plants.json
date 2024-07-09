@@ -1,0 +1,65 @@
+{
+    "Ves'iso": {
+        "name": "Ves'iso",
+        "meta": {
+            "Type": "Ingredient",
+            "Used": "Item used.",
+            "image": "https://i.imgur.com/8SptIIb.png"
+        },
+        "description": "[INGREDIENT]\nAn aquamarine lotus. Its petals are crunchy like carrots. The Ves'iso is named after the fact that it cannot leave its growing environment (water). Once it's picked off from its stem, it will dry off and wither immediately. Though it tastes the same, it no longer looks as beautiful -- It's a shame that it cannot be used as decoration as it withers so quickly. Ves'iso seemed to be named after an elven princess who had turned anew after she had fled her castle."
+    },
+    "Ar'aero": {
+        "name": "Ar'aero",
+        "meta": {
+            "Type": "Ingredient",
+            "Used": "Item used.",
+            "image": "https://i.imgur.com/AWTAIyQ.png"
+        },
+        "description": "[INGREDIENT]\nGray, seeded fruit that looks like a mix between a potato and a strawberry. The Ar'aero is a very juicy fruit that gives off a mix of spiciness and sweetness. Consuming it shall give you a brain-freeze, but it is certainly a great choice for sauce and dips."
+    },
+    "Milareena": {
+        "name": "Milareena",
+        "meta": {
+            "Type": "Ingredient",
+            "Used": "Item used.",
+            "image": "https://i.imgur.com/97CVLYa.png"
+        },
+        "description": "[INGREDIENT]\nA teal-colored rose that is powdered with white dots. It looks like a rose, but it is certainly an edible fruit. The Milareena crystalizes and becomes unedible when chilled, so it must be eaten in room temperature, or in warmer days. It is said that Milareena can give its consumer a charming spell, so the discoverers of this fruit named it \"Warm in Love\" in their own language."
+    },
+    "Amisolette": {
+        "name": "Amisolette",
+        "meta": {
+            "Type": "Ingredient",
+            "Used": "Item used.",
+            "image": "https://i.imgur.com/qm09fFw.png"
+        },
+        "description": "[INGREDIENT]\nNamed after its striped nature and heart-shaped leaves. The leaves are edible, though its crunchy and tough to chew. It glistens when wet. Looking like red hearts among the grass, Amisolettes were once a popular choice of ingredient for food that express love."
+    },
+    "Untban": {
+        "name": "Untban",
+        "meta": {
+            "Type": "Ingredient",
+            "Used": "Item used.",
+            "image": "https://i.imgur.com/KEFZDPp.png"
+        },
+        "description": "[INGREDIENT]\nA sweet chewy fruit that looks like a mango but in mute yellow color. Untban was once used as an anesthetic by doctors. It causes its consumer to grow numb and knock out for about an hour, but with the help of alchemy, this effect may extend."
+    },
+    "Zhiadbur": {
+        "name": "Zhiadbur",
+        "meta": {
+            "Type": "Ingredient",
+            "Used": "Item used.",
+            "image": "https://i.imgur.com/0uHKhsH.png"
+        },
+        "description": "[INGREDIENT]\nA small, purple, carrot-looking fruit. Zhiadbur is named after the doctor who discovered it. Zhiadbur is very bitter but was often used as an effective tranqualizer. One of the most commonly used natural ingredient to sleep."
+    },
+    "Zhiadbur": {
+        "name": "Zhiadbur",
+        "meta": {
+            "Type": "Ingredient",
+            "Used": "Item used.",
+            "image": "https://i.imgur.com/0uHKhsH.png"
+        },
+        "description": "[INGREDIENT]\nA small, purple, carrot-looking fruit. Zhiadbur is named after the doctor who discovered it. Zhiadbur is very bitter but was often used as an effective tranqualizer. One of the most commonly used natural ingredient to sleep."
+    }
+}

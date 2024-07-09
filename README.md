@@ -176,6 +176,7 @@ Made by [@Henry#8808](https://discordapp.com/channels/@me/122739797646245899)
   - [loadpokemon](#loadpokemon)
   - [loadstarwars](#loadstarwars)
   - [loadstarwarsshop](#loadstarwarsshop)
+  - [loadtgpshop](#loadtgpshop)
   - [prefix](#prefix)
   - [setdefaultmap](#setdefaultmap)
   - [setprefix](#setprefix)
@@ -1068,6 +1069,12 @@ Requires Bot Moderator or Bot Admin
 Requires Bot Moderator or Bot Admin
 
 >**Usage:** `rp!loadstarwarsshop`
+
+#### loadtgpshop
+>**Description:** This command will pre-load all Topaz Guardian Green Potions and make them available in shop
+Requires Bot Moderator or Bot Admin
+
+>**Usage:** `rp!loadtgpshop`
 
 #### prefix
 >**Description:** View the current custom prefix for the server
