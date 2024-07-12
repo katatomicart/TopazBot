@@ -297,6 +297,7 @@ class Characters(commands.Cog):
         Bot Moderator or Bot Admin are required to edit other people's characters
         """
         character = await self.bot.di.get_character(ctx.guild, name)
+        lowcase_attribute = attribute.lower()
         if character is None:
             await ctx.send(await _(ctx, "That character doesn't exist!"))
             return
@@ -310,7 +311,7 @@ class Characters(commands.Cog):
             await ctx.send(await _(ctx, "You do not own this character!"))
             return
 
-        if attribute == "description" and len(value) > 3500:
+        if lowcase_attribute == "description" and len(value) > 3500:
             await ctx.send(await _(ctx, "Can't have a description longer than 3500 characters!"))
             return
         elif len(attribute) + len(value) > 1024:
@@ -318,16 +319,16 @@ class Characters(commands.Cog):
             return
 
         character = list(character)
-        if attribute == "name":
+        if lowcase_attribute == "name":
             await self.bot.di.remove_character(ctx.guild, character[0])
             character[0] = value
-        elif attribute == "description":
+        elif lowcase_attribute == "description":
             character[2] = value
-        elif attribute == "level":
+        elif lowcase_attribute == "level":
             character[3] = int(value)
-        elif attribute == "class_name":
+        elif lowcase_attribute == "class_name":
             character[4] = value
-        elif attribute == "meta":
+        elif lowcase_attribute == "meta":
             try:
                 character[5] = {}
                 if "\n" in value:
@@ -344,7 +345,12 @@ class Characters(commands.Cog):
                 await ctx.send(await _(ctx, "Invalid formatting! Try again"))
                 return
         else:
-            character[5][attribute] = value
+            lowcased_keys = dict([(k.lower(), k) for k in character[5].keys()])
+            existing_attribute = lowcased_keys.get(lowcase_attribute, None)
+            if existing_attribute:
+                character[5][existing_attribute] = value
+            else:
+                character[5][attribute] = value
 
         async with self.bot.di.rm.lock(ctx.guild.id):
             await self.bot.di.add_character(ctx.guild, Character(*character))
