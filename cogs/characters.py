@@ -181,7 +181,7 @@ class Characters(commands.Cog):
                 else:
                     content += response.content + "\n"
         character["description"] = content
-        char_classname = "Squire"
+        char_classname = "N/A"
         while True:
             await ctx.send(
                 await _(ctx, "Name the class that the character has (type skip if you want to add it later) ")
@@ -193,11 +193,11 @@ class Characters(commands.Cog):
                     await _(ctx, f"Class assignment skipped"))
                 break
             await ctx.send(
-                await _(ctx, f"Are you sure that the class {char_classname} is correct? (y/n)"))
+                await _(ctx, f"Are you sure that the class {new_class_name} is correct? (y/n)"))
             confirmation = await self.bot.wait_for("message", check=check, timeout=300)
             if confirmation.content.lower() == "y":
+                char_classname = new_class_name.capitalize()
                 break
-            char_classname = new_class_name.capitalize()
         character["class_name"] = char_classname
         await ctx.send(
             await _(ctx,

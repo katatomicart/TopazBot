@@ -158,7 +158,7 @@ class Bot(commands.AutoShardedBot):
         print(self.user.name)
         print(self.user.id)
         print('------')
-        await self.change_presence(activity=discord.Game(name="I swear this is the last change"))
+        await self.change_presence(activity=discord.Game(name="I lied, the previous one wasn't the last"))
         if self._first:
             self._first = False
 
