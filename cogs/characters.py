@@ -238,7 +238,7 @@ class Characters(commands.Cog):
                         return
                     continue
 
-        character["level"] = character["meta"].pop("level", None)
+        character["level"] = character["meta"].pop("Level", None)
         if (len(ctx.message.mentions) > 0 and ouser is None) or (len(ctx.message.mentions) > 1 and ouser is not None):
             newname = character["name"].replace("!", "")
             data = await self.bot.db.get_guild_data(ctx.guild)

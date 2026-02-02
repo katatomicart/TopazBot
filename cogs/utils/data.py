@@ -21,6 +21,7 @@
 import asyncio
 import dataclasses
 import re
+import logging
 from builtins import property as _property, tuple as _tuple
 from collections import Counter
 from collections import OrderedDict
@@ -35,6 +36,8 @@ from discord.ext import commands
 
 from .translation import _
 
+logger = logging.getLogger(__name__)
+logging.basicConfig(level=logging.DEBUG)
 
 @dataclasses.dataclass
 class Pet:
@@ -248,7 +251,19 @@ class MemberConverter(commands.MemberConverter):
             role = await commands.RoleConverter.convert(self, ctx, argument)
             return role.members
         except:
+            pass
+        try:
             return await super().convert(ctx, argument)
+        except commands.MemberNotFound:
+            pass
+        id_match = re.search(r'(\d{15,20})', argument)
+        if id_match:
+            try:
+                return await ctx.guild.fetch_member(int(id_match.group(1)))
+            except discord.HTTPException:
+                pass
+        raise commands.MemberNotFound(argument)
+
 
 
 class NumberConverter(commands.Converter):

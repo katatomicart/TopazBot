@@ -401,9 +401,9 @@ if "debug" in sys.argv:
 async def start():
     intents = discord.Intents.default()
     intents.members = True
-    intents.messages = True
+    intents.presences = True
     intents.message_content = True
-
+    
     prp = Bot(
         command_prefix=prefix,
         description=description,
